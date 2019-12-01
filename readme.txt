@@ -1,10 +1,9 @@
 === Flexo Archives ===
-Contributors: heathharrelson
-Donate link: http://amzn.com/w/J010ZTQZM654 
+Contributors: mattyrob, heathharrelson
 Tags: sidebar, archive, archives, collapsible archive, collapsible, collapse, widget
-Requires at least: 2.7
-Tested up to: 3.2.1
-Stable tag: 2.1.5
+Requires at least: 4.9
+Tested up to: 4.9
+Stable tag: 3.0
 
 Displays your archives as a compact list of years that expands when clicked.
 
@@ -56,11 +55,11 @@ Unfortunately, some WordPress themes don't support widgets. If you are familiar 
 
 = How do I use the standalone Flexo Archives function? =
 
-To use the standalone Flexo Archives function, install the plugin code as described in the first step of the installation instructions. 
+To use the standalone Flexo Archives function, install the plugin code as described in the first step of the installation instructions.
 
 Next, enable the standalone function:
 
-1. Go to the WordPress dashboard and click the 'Settings' menu. In recent versions of WordPress, this menu is near the bottom of the left column. 
+1. Go to the WordPress dashboard and click the 'Settings' menu. In recent versions of WordPress, this menu is near the bottom of the left column.
 1. Click the 'Flexo Archives' option in the expanded menu.
 1. Enable the standalone function using the checkbox and submit the form.
 
@@ -69,80 +68,3 @@ Finally, modify your theme to use the standalone function. Edit the PHP of your 
 `<?php if (function_exists('flexo_standalone_archives')){flexo_standalone_archives();} ?>`
 
 The code will output the nested archive lists into the HTML at that point in the theme and automatically attach JavaScript to make the lists expand and contract.
-
-== Screenshots ==
-
-1. An example archive list with one year expanded.
-
-== Changelog ==
-
-= 2.1.5 =
-
-* By user request, adds an option to include yearly post totals in the year links.
-
-= 2.1.3 =
-
-* By user request, adds an option to choose sort order for months in lists.
-* Simplifies the way default settings are saved.
-
-= 2.1.2 =
-
-* Adds support for having multiple widgets.
-* By user request, adds the option to add rel="nofollow" to links.
-* Dutch translation.
-
-= 2.1.1 =
-
-* Restores compatibility with PHP4. Sorry about that. :(
-
-= 2.1.0 =
-
-* Reimplemented as a class.
-* Fixed issue where users of the standalone function couldn't enable post counts.
-* Play nice with the getarchives_where and getarchives_join filters.
-* Initial internationalization support.
-
-= 2.0.3 =
-
-* Added a standalone function for users who can't use the widget.
-
-= 2.0.2 = 
-
-* Fixed a typo in the uninstall function, changed comments. Not released.
-
-= 2.0.1 =
-
-* Add nonce field and check to enhance widget form security.
-
-= 2.0.0 =
-
-* Rewrite using jQuery for expand / contract code.
-* Add animation.
-* Drop support for ancient versions of WordPress.
-* Test for WordPress 3.1.
-
-== Upgrade Notice ==
-
-= 2.1.5 =
-Adds an option to include yearly post totals in the year links. Upgrade if you want this feature.
-
-= 2.1.3 =
-Adds an option to change the sort order of months in the lists. Upgrade if you want this feature.
-
-= 2.1.2 =
-This is a major upgrade that adds support for multiple Flexo widgets. Dutch translation also added.
-
-= 2.1.1 =
-Fixes PHP4 incompatibility introduced by 2.1.0. PHP4 users must upgrade.
-
-= 2.1.0 =
-Fixed an issue with the standalone function and added initial internationalization support. Users of the standalone function or wishing to localize the plugin should upgrade.
-
-= 2.0.3 =
-Added a standalone function for users who can't use the widget.
-
-= 2.0.1 =
-Enhanced security.
-
-= 2.0.0 =
-Adds animation when the list is expanded / collapsed.
