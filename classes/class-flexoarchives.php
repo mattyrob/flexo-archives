@@ -3,18 +3,14 @@ class FlexoArchives {
 	// Options constants
 	public $old_options_name       = 'widget_flexo';
 	public $options_name           = 'flexo_archives';
-	public $opt_standalone         = 'standalone'; // bool: standalone func enabled?
 	public $opt_animate            = 'animate'; // bool: list animation enabled
 	public $opt_nofollow           = 'nofollow'; // bool: add rel="nofollow" to links
 	public $opt_count              = 'count'; // bool: monthly post counts in lists
-	public $opt_count_standalone   = 'standalone-count'; // bool: monthly post counts
-	public $opt_yrtotal_standalone = 'standalone-yeartotal'; // bool: yearly post total DEPRECATED
 	public $opt_yrtotal            = 'yeartotal';// bool: yearly post total
 	public $opt_wtitle             = 'title'; // string; widget title string
 	public $opt_converted          = '2'; // array: converted non-multi widget settings
 	public $opt_month_desc         = 'month-descend'; // bool: order months descending
 	public $opt_collapse_decades   = 'collapse-decades'; // bool: collapse complete decades
-	public $opt_yrcount_standalone;
 	public $opt_yrcount;
 
 	// Filename constants
@@ -25,7 +21,7 @@ class FlexoArchives {
 	public $options;
 
 	/**
-	 * PHP5 constructor
+	 * PHP constructor
 	 */
 	public function __construct() {
 		$this->initialize();
@@ -36,18 +32,19 @@ class FlexoArchives {
 	 */
 	public function initialize() {
 		// get translations loaded
-		add_action( 'init', array( &$this, 'load_translations' ) );
+		add_action( 'init', array( $this, 'load_translations' ) );
 
 		// make sure options are initialized
 		$this->set_default_options();
 
 		// register callbacks
-		add_action( 'init', array( &$this, 'enqueue_standalone_scripts' ) );
-		add_action( 'admin_menu', array( &$this, 'options_menu_item' ) );
+		if ( is_admin() ) {
+			add_action( 'admin_menu', array( $this, 'options_menu_item' ) );
+		}
 
-		add_action( 'widgets_init', array( &$this, 'widget_init' ) );
+		add_action( 'widgets_init', array( $this, 'widget_init' ) );
 
-		register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall' ) );
+		register_activation_hook( FLEXOPLUGIN, array( __CLASS__, 'activate' ) );
 	}
 
 	/**
@@ -60,9 +57,6 @@ class FlexoArchives {
 			$this->opt_animate            => true,
 			$this->opt_nofollow           => false,
 			$this->opt_month_desc         => false,
-			$this->opt_standalone         => false,
-			$this->opt_count_standalone   => false,
-			$this->opt_yrcount_standalone => false,
 			$this->opt_yrcount            => false,
 		);
 
@@ -71,12 +65,6 @@ class FlexoArchives {
 			if ( ! isset( $options[ $def_key ] ) ) {
 				$options[ $def_key ] = $def_value;
 			}
-		}
-
-		// convert option to print yearly totals to a global option
-		// rather than one for the standalone function only
-		if ( $options[ $this->opt_yrcount_standalone ] ) {
-			$options[ $this->opt_yrcount ] = true;
 		}
 
 		// widget options
@@ -165,27 +153,11 @@ class FlexoArchives {
 	}
 
 	/**
-	 * Reports whether the user enabled post counts for standalone
-	 */
-	public function standalone_count_enabled() {
-		$options = $this->get_opts();
-		return $options[ $this->opt_count_standalone ];
-	}
-
-	/**
 	 * Reports whether the user enabled yearly post totals
 	 */
 	public function yearly_total_enabled() {
 		$options = $this->get_opts();
 		return $options[ $this->opt_yrtotal ];
-	}
-
-	/**
-	 * Reports whether standalone archive function is enabled
-	 */
-	public function standalone_enabled() {
-		$options = $this->get_opts();
-		return $options[ $this->opt_standalone ];
 	}
 
 	/**
@@ -243,8 +215,7 @@ class FlexoArchives {
 	}
 
 	/**
-	 * standalone anymore
-	 * Register the configuration page for the standalone function
+	 * Register the configuration page
 	 */
 	public function options_menu_item() {
 		$page_title = __( 'Flexo Archives Advanced Options', 'flexo-archives' );
@@ -281,8 +252,6 @@ class FlexoArchives {
 			$newoptions[ $this->opt_animate ]          = isset( $_POST['flexo-animate'] );
 			$newoptions[ $this->opt_nofollow ]         = isset( $_POST['flexo-nofollow'] );
 			$newoptions[ $this->opt_month_desc ]       = isset( $_POST['flexo-monthdesc'] );
-			$newoptions[ $this->opt_standalone ]       = isset( $_POST['flexo-standalone'] );
-			$newoptions[ $this->opt_count_standalone ] = isset( $_POST['flexo-count'] );
 			$newoptions[ $this->opt_yrtotal ]          = isset( $_POST['flexo-yrtotal'] );
 			$newoptions[ $this->opt_collapse_decades ] = isset( $_POST['flexo-decades'] );
 		}
@@ -293,9 +262,7 @@ class FlexoArchives {
 			$this->set_opts( $newoptions );
 		}
 
-		$standalone = $this->standalone_enabled() ? 'checked="checked"' : '';
 		$animate    = $this->animation_enabled() ? 'checked="checked"' : '';
-		$count      = $this->standalone_count_enabled() ? 'checked="checked"' : '';
 		$total      = $this->yearly_total_enabled() ? 'checked="checked"' : '';
 		$nofollow   = $this->nofollow_enabled() ? 'checked="checked"' : '';
 		$monthdesc  = $this->month_order() === 'DESC' ? 'checked="checked"' : '';
@@ -315,20 +282,6 @@ class FlexoArchives {
 		<p><label for="flexo-monthdesc"><input type="checkbox" class="checkbox" id="flexo-monthdesc" name="flexo-monthdesc" <?php echo $monthdesc; ?>/> <?php _e( 'sort months in descending order', 'flexo-archives' ); ?></label></p>
 		<p><label for="flexo-yrtotal"><input type="checkbox" class="checkbox" id="flexo-yrtotal" name="flexo-yrtotal" <?php echo $total; ?>/> <?php _e( 'show yearly post totals in lists', 'flexo-archives' ); ?></label></p>
 		<p><label for="flexo-decades"><input type="checkbox" class="checkbox" id="flexo-decades" name="flexo-decades" <?php echo $decades; ?>/> <?php _e( 'collapse complete decades', 'flexo-acrhives' ); ?></label></p>
-	</fieldset>
-
-	<p><?php _e( 'The following options are only relevant to users who cannot use or do not want to use the sidebar widget. If you are using the widget, then you should ignore the following settings.', 'flexo-archives' ); ?></p>
-	<p><?php _e( 'To use the standalone version of the archives, check the "enable standalone theme function" box below, and then add the following code your theme where you want the expandable archive lists to be:', 'flexo-archives' ); ?></p>
-
-	<code>&lt;?php if (function_exists('flexo_standalone_archives')){ flexo_standalone_archives(); } ?&gt;</code>
-
-	<p><?php _e( 'The code will output the nested archive lists into the HTML at that point in the theme. JavaScript automatically attached to the pages generated by WordPress will make the lists expand and collapse.', 'flexo-archives' ); ?></p>
-
-	<fieldset>
-		<legend><?php _e( 'Standalone Function Options', 'flexo-archives' ); ?></legend>
-		<p><label for="flexo-standalone"><input type="checkbox" class="checkbox" id="flexo-standalone" name="flexo-standalone" <?php echo $standalone; ?>/> <?php _e( 'enable standalone theme function', 'flexo-archives' ); ?></label></p>
-		<p><label for="flexo-count"><input type="checkbox" class="checkbox" id="flexo-count" name="flexo-count" <?php echo $count; ?>/> <?php _e( 'include monthly post counts in lists', 'flexo-archives' ); ?></label></p>
-		</legend>
 	</fieldset>
 
 	<input type="submit" name="flexo-submit" class="button-primary" value="<?php _e( 'Submit', 'flexo-archives' ); ?>"/>
@@ -531,10 +484,9 @@ class FlexoArchives {
 			}
 
 			if ( true === $decade_start ) {
-				$decade_span = sprintf( $decade_title, ( $year - 9 ) . '-' . $year );
-				$link = get_year_link( $year-9 );
-				$title = 'title="' . sprintf( $decade_title, $decade_span ) . '">';
-				$list_html   .= sprintf( '<ul><li><a href="%s" class="flexo-decade-link" ' . $title . $decade_span . '</a>', $link );
+				$decade_span = ( $year - 9 ) . ' - ' . $year;
+				$title = 'title="' . sprintf( $decade_title, ( $year - 9 ) . '-' . $year ) . '">';
+				$list_html   .= '<ul><li><a href="#" class="flexo-decade-link" ' . $title . $decade_span . '</a>';
 				$decade_start = false;
 			}
 			if ( true === $decade_end ) {
@@ -570,9 +522,6 @@ class FlexoArchives {
 				$list_html = $this->add_link_nofollow( $list_html );
 			}
 		}
-
-		// Close the last list
-		$list_html .= '</ul></li></ul>';
 
 		return $list_html;
 	}
@@ -624,18 +573,6 @@ class FlexoArchives {
 
 		// Close out the widget
 		echo $args['after_widget'];
-	}
-
-	/**
-	 * Attach JavaScript to normal pages if the standalone archives
-	 * function is enabled
-	 */
-	public function enqueue_standalone_scripts() {
-		if ( ! is_admin() && $this->standalone_enabled() ) {
-			wp_enqueue_script( 'jquery' );
-			wp_register_script( 'flexo', $this->script_url(), array( 'jquery' ), '2.0', true );
-			wp_enqueue_script( 'flexo' );
-		}
 	}
 
 	/**
@@ -727,16 +664,22 @@ class FlexoArchives {
 		// Add CSS and JavaScript to header if we're active
 		if ( ! is_admin() && ! wp_is_mobile() && is_active_widget( array( &$this, 'widget_archives' ) ) ) {
 			wp_enqueue_script( 'jquery' );
-			wp_register_script( 'flexo', $this->script_url(), array( 'jquery' ), '2.0', true );
+			wp_register_script( 'flexo', $this->script_url(), array( 'jquery' ), '3.0', true );
 			wp_enqueue_script( 'flexo' );
 		}
 	}
 
 	/**
-	 * Uninstall Function. Deletes plugin configuration from the
-	 * database.
+	 * On activation, register our uninstall hook
 	 */
-	public function uninstall() {
+	static function activate() {
+		register_uninstall_hook( FLEXOPLUGIN, array( __CLASS__, 'uninstall' ) );
+	}
+
+	/**
+	 * Uninstall Function. Deletes plugin configuration from the database
+	 */
+	static function uninstall() {
 		$options = $this->get_opts();
 
 		if ( is_array( $options ) ) {

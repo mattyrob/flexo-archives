@@ -28,22 +28,8 @@ Version: 3.0
  *
  */
 
-/**
- * Output the archive lists as a standalone function, for users
- * can't or don't want to use the widget.
- */
-function flexo_standalone_archives() {
-	$archives = new FlexoArchives();
-
-	if ( $archives->standalone_enabled() ) {
-		echo $archives->build_archives_list(
-			$archives->standalone_count_enabled(),
-			$archives->yearly_total_enabled()
-		);
-	}
-}
-
 global $flexo_archives;
+define( 'FLEXOPLUGIN', __FILE__ );
 define( 'FLEXOPATH', trailingslashit( dirname( __FILE__ ) ) );
 define( 'FLEXODIR', trailingslashit( dirname( plugin_basename( __FILE__ ) ) ) );
 
