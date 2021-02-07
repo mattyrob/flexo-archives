@@ -1,0 +1,23 @@
+name: Javascript linting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  jshint:
+    name: JSHint linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run JSHint Checks
+        uses: moneyforward/jshint-action@v0
+        with:
+          files: |
+            flexo-anim.js
+            flexo.js
