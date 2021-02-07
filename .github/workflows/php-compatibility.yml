@@ -1,0 +1,41 @@
+name: PHP Compatibility
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  php-comatibility:
+    name: Check PHP compatibility
+    runs-on: ubuntu-latest
+    if: ${{ github.repository == 'mattyrob/flexo-archives' || github.event_name == 'pull_request' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          coverage: none
+          tools: composer, cs2pr
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: "--no-progress --no-ansi --no-interaction"
+
+      - name: Make Composer packages available globally
+        run: echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+      - name: Log debug information
+        run: |
+          php --version
+          composer --version
+          phpcs -i
+
+      - name: Run PHP compatibility tests
+        run: phpcs --standard=phpcompat.xml.dist -q --report=checkstyle | cs2pr

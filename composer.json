@@ -1,0 +1,18 @@
+{
+	"name": "mattyrob/flexo-archives",
+	"license": "GPL-2.0-or-later",
+	"description": "Archive sidebar widget that collapses and open to years and decades with Javascript saving screen space",
+	"keywords": [
+		"archives", "widget"
+	],
+	"support": {
+		"issues": "https://github.com/mattyrob/flexo-archives"
+	},
+	"require": {
+		"php": ">=5.6"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.6.2 || ^0.7.0",
+		"phpcompatibility/phpcompatibility-wp": "^2.1.0"
+	}
+}
