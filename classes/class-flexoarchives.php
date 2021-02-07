@@ -672,14 +672,14 @@ class FlexoArchives {
 	/**
 	 * On activation, register our uninstall hook
 	 */
-	static function activate() {
+	public function activate() {
 		register_uninstall_hook( FLEXOPLUGIN, array( __CLASS__, 'uninstall' ) );
 	}
 
 	/**
 	 * Uninstall Function. Deletes plugin configuration from the database
 	 */
-	static function uninstall() {
+	public function uninstall() {
 		$options = $this->get_opts();
 
 		if ( is_array( $options ) ) {
