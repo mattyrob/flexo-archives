@@ -20,6 +20,3 @@ jobs:
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
           eslint-rc: .eslintrc.js
-          execute-on-files:
-            - flexo-anim.js
-            - flexo.js
