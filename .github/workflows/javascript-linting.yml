@@ -8,16 +8,18 @@ on:
 
 jobs:
   jshint:
-    name: JSHint linting
+    name: ESLint linting
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Run JSHint Checks
-        uses: moneyforward/jshint-action@v0
+      - name: Run ESLint Checks
+        uses: mrdivyansh/eslint-action@1.0.7
         with:
-          files: |
-            flexo-anim.js
-            flexo.js
+          repo-token: ${{secrets.GITHUB_TOKEN}}
+          eslint-rc: .eslintrc.js
+          execute-on-files:
+            - flexo-anim.js
+            - flexo.js
