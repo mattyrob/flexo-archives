@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="PHP Compatibility for Subcribe2 for ClassicPress">
+<ruleset name="PHP Compatibility for Flexo Archives for ClassicPress">
 	<description>Apply PHP compatibility checks to all Core files</description>
 
 	<!-- Use PHPCompatibility/PHPCompatibilityWP -->
@@ -30,14 +30,9 @@
 	<arg value="ps"/>
 
 	<!-- Scan plugin files and folders. -->
-	<file>subscribe2.php</file>
-	<file>admin/</file>
+	<file>flexo-archives-widget.php</file>
 	<file>classes/</file>
-	<file>include/</file>
 
 	<!-- Code which doesn't go into production may have different requirements. -->
 	<exclude-pattern>/node_modules/*</exclude-pattern>
-
-	<!-- Exclude external library for plugin updates. -->
-	<exclude-pattern>/plugin-update-checker/*</exclude-pattern>
 </ruleset>
